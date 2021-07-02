@@ -9,7 +9,7 @@ public class Foo{
 	public int testMe(int a, int b) throws Exception
 	{
 		if (a > 0){
-			if(a - b < 50){
+			if(a - b == 0){
 				throw new Exception("Hey!");
 			}
 		}
