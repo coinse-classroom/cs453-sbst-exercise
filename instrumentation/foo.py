@@ -1,4 +1,5 @@
 import math
+import random
 # import pytest
 
 appr = 0
@@ -12,18 +13,21 @@ def norm(x):
 def fitness():
     return appr + norm(bdist)
 
-def branch_lte(x, y):
-    global bdist
+def branch_lte(_id, x, y):
+    global bdist, appr
+    appr = 2 - _id
     bdist = x - y + K
     return x <= y
 
-def branch_gte(x, y):
-    global bdist
+def branch_gte(_id, x, y):
+    global bdist, appr
+    appr = 2 - _id
     bdist = y - x + K
     return x >= y
 
-def branch_eq(x, y):
-    global bdist
+def branch_eq(_id, x, y):
+    global bdist, appr
+    appr = 2 - _id
     bdist = abs(x - y)
     return x == y
 
@@ -34,9 +38,9 @@ def branch_eq(x, y):
 # approx and bdist directly
 
 def foo(x, y, z):
-    if branch_gte(z, 4):
-        if branch_lte(z, 10):
-            if branch_eq(x, y):
+    if branch_gte(0, z, 4):
+        if branch_lte(1, z, 10):
+            if branch_eq(2, x, y):
                 # target
                 return True
             else:
@@ -46,15 +50,50 @@ def foo(x, y, z):
     else:
         return False
 
-print(foo(11, 2, 7))
-print(bdist)
-# assert 2.004 == pytest.approx(fitness(), 0.001)
+LEN = 3
+MAX = 256
 
-# foo(11, 2, 11)
-# assert 1.001 == pytest.approx(fitness(), 0.001)
+def init_random(len, max):
+    # randomly initialise a solution of length len, of randrange(max)
+    sol = []
+    for i in range(len):
+        sol.append(random.randrange(max))
+    return sol
 
-# foo(11, 2, 9)
-# assert 0.009 == pytest.approx(fitness(), 0.001)
+def get_neighbour(sol):
+    neighbours = []
+    # generate neighbours of sol
+    for i in range(len(sol)):
+        n1 = sol[:]
+        n1[i] += 1
+        n2 = sol[:]
+        n2[i] -= 1
+        neighbours.append(n1)
+        neighbours.append(n2)
+    return neighbours
 
-# foo(2, 2, 9)
-# assert fitness() == 0
+def evaluate(sol):
+    foo(sol[0], sol[1], sol[2])
+    return fitness()
+
+# to return the best solution found within budget, and spent cost
+def hillclimbing(budget):
+    climb = True
+    spent = 0
+    sol = init_random(LEN, MAX)
+    s_fit = evaluate(sol)
+    spent += 1
+    while climb and spent < budget:
+        neighbours = get_neighbour(sol)
+        climb = False
+        for n in neighbours:
+            n_fit = evaluate(n)
+            spent += 1
+            if n_fit < s_fit:
+                sol = n[:]
+                s_fit = n_fit
+                climb = True
+    return sol, spent
+
+sol, cost = hillclimbing(2000)
+print(sol, cost)
