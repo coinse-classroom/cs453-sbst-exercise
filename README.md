@@ -2,7 +2,7 @@
 
 ### [Randoop](https://randoop.github.io/randoop/)
 
-1. Compule `Foo.java`
+1. Compile `Foo.java`
 2. Invoke Randoop on class `Foo` to generate regression and error test cases (use the option to consider uncaught exceptions as errors)
 3. Try to create another Java class `Bar` that contains an exception-raising branch that is very difficult for Randoop to execute
 
